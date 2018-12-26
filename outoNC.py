@@ -16,6 +16,7 @@ headers = ['time', 'java_heap', 'native_heap', 'code', 'stack', 'graphics', 'pri
 
 data = pd.read_csv(nc_file, names=headers)
 # print data
+data.time = pd.to_datetime(data.time)
 plt.plot(data['time'], data['java_heap'])
 # , 'native_heap', 'code', 'stack', 'graphics', 'private_other', 'system', 'total'])
 plt.xlabel('Time')
