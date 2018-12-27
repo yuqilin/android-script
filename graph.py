@@ -9,13 +9,23 @@
 
 """
 
-import os
-import matplotlib.pyplot as plt
 import csv
-from datetime import datetime
+import getopt
+import matplotlib.pyplot as plt
+import os
+import sys
 
-csv_file = os.path.join(os.path.dirname(__file__), "mem_2018-12-26-184445.csv")
-figure_file = os.path.join(os.path.dirname(__file__), "mem_graph.png")
+# from datetime import datetime
+
+opts, args = getopt.getopt(sys.argv[1:], "")
+
+input_file = args[0]
+output_file = os.path.splitext(input_file)[0] + ".png"
+
+# print input_file, output_file
+
+csv_file = input_file #os.path.join(os.path.dirname(__file__), input_file)
+figure_file = output_file #os.path.join(os.path.dirname(__file__), "mem_graph.png")
 
 # mem_info = {
 # 	'java_heap' : [],
@@ -61,7 +71,7 @@ with open(csv_file,'r') as csvfile:
 # print graphics
 # print total
 
-fig = plt.figure(figsize=(16,9), dpi=200)
+fig = plt.figure(figsize=(16,9), dpi=120)
 
 plt.plot(time, java_heap, label='java_heap')
 plt.plot(time, native_heap, label='native_heap')
@@ -71,22 +81,18 @@ plt.plot(time, graphics, label='graphics')
 # # plt.plot(time, private_other, label='private_other')
 # # plt.plot(time, system, label='system')
 plt.plot(time, total, label='total')
+
 plt.xlabel('Time')
 plt.ylabel('Memory (MB)')
 plt.title('Trendline')
 
-# fig.autofmt_xdate()
-plt.xticks(rotation=90, fontsize=8)
-# plt.tick_params(axis='both', which='major', labelsize=16)
-
-# ax = plt.axis('equal')
-# print ax
+plt.xticks(rotation=90)
 
 plt.legend(loc=1)
 # plt.legend(bbox_to_anchor=(1, 1))
 
 plt.tight_layout()
 
-
 # plt.show()
 plt.savefig(figure_file)
+
