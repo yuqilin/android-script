@@ -7,7 +7,7 @@
 #
 
 
-PKG_NAME=
+PKG_NAME=com.immomo.momo
 CURRENT_ACTIVITY=
 
 # get current app package name
@@ -51,13 +51,29 @@ TOTAL_PATTERN="TOTAL:"
 
 get_app_id
 
+if [ -z $PKG_NAME ]; then
+	echo "NO package name !!!"
+	exit
+fi
+
 write_csv_header
 
 while [ true ]; do
 
 # dumpmem | grep --color -E 'Java Heap:|Native Heap:|Code:|Stack:|Graphics:|Private Other:|System:|TOTAL:'
 
-MEMINFO="$(adb shell dumpsys meminfo $PKG_NAME)"
+NO_PROCESS=false
+
+MEMINFO=$(adb shell dumpsys meminfo $PKG_NAME)
+
+# echo $(adb shell dumpsys meminfo com.immomo.com 2>&1)
+
+# echo "$MEMINFO"
+
+if [[ "$MEMINFO" == "No process found"* || -z "$MEMINFO" ]]; then
+	echo "No process found for: $PKG_NAME"
+	exit
+fi
 
 java_heap=`echo "$MEMINFO" | grep "$JAVA_HEAP_PATTERN" | awk -F ':' '{print $2}' |sed s/[[:space:]]//g`
 native_heap=`echo "$MEMINFO" | grep "$NATIVE_HEAP_PATTERN" | awk -F ':' '{print $2}' |sed s/[[:space:]]//g`
@@ -77,7 +93,8 @@ private_other=`awk 'BEGIN{printf "%.2f\n", '$private_other'/1000}'`
 system=`awk 'BEGIN{printf "%.2f\n", '$system'/1000}'`
 total=`awk 'BEGIN{printf "%.2f\n", '$total'/1000}'`
 
-printf "java_heap=%6.2fMB, native_heap=%7.2fMB, code=%6.2fMB, stack=%5.2fMB, graphics=%7.2fMB, private_other=%6.2fMB, system=%7.2fMB, total=%7.2fMB\n" $java_heap $native_heap $code $stack $graphics $private_other $system $total
+printf "java_heap=%6.2fMB, native_heap=%7.2fMB, graphics=%7.2fMB, total=%7.2fMB\n" $java_heap $native_heap $graphics $total
+# printf "java_heap=%6.2fMB, native_heap=%7.2fMB, code=%6.2fMB, stack=%5.2fMB, graphics=%7.2fMB, private_other=%6.2fMB, system=%7.2fMB, total=%7.2fMB\n" $java_heap $native_heap $code $stack $graphics $private_other $system $total
 # echo "java_heap=$java_heap, native_heap=$native_heap, code=$code, stack=$stack, graphics=$graphics, private_other=$private_other, system=$system, total=$total"
 
 write_csv_line
